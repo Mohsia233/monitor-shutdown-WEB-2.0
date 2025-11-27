@@ -1,0 +1,259 @@
+/* 基础样式 */
+.port-info {
+    background: #007bff;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+h1 {
+    color: #2c3e50;
+    margin: 0;
+}
+
+.last-update {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* 访问信息样式 */
+.access-info {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.access-info h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.url-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.url-item {
+    background: rgba(255,255,255,0.2);
+    padding: 12px 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.url-item a {
+    color: white;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+.url-item a:hover {
+    text-decoration: underline;
+}
+
+.copy-btn {
+    background: rgba(255,255,255,0.3);
+    border: none;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.copy-btn:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+/* 统计卡片样式 */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    padding: 25px;
+    text-align: center;
+    border: 1px solid #f0f0f0;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h2 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 1.3em;
+}
+
+.gauge-container {
+    position: relative;
+    height: 180px;
+    margin: 20px 0;
+}
+
+.gauge-value {
+    position: absolute;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.status {
+    margin-top: 10px;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.status.normal {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status.caution {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status.warning {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* 网络信息样式 */
+.network-info {
+    text-align: left;
+}
+
+.network-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.network-item .label {
+    color: #6c757d;
+}
+
+.network-item .value {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* 操作按钮样式 */
+.action-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.shutdown-button, .restart-button {
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    min-width: 160px;
+}
+
+.shutdown-button {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    color: #721c24;
+}
+
+.restart-button {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    color: #004085;
+}
+
+.shutdown-button:hover, .restart-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+#actionMessage {
+    margin-top: 15px;
+    font-weight: bold;
+    min-height: 25px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .url-item {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}

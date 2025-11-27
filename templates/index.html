@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统监控面板 - 端口8097</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ 系统资源监控</h1>
+            <div class="port-info">端口: 8097</div>
+            <div class="last-update">最后更新: <span id="lastUpdate">--:--:--</span></div>
+        </div>
+        
+        <!-- 移除了访问地址信息部分 -->
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <h2>💻 CPU 使用率</h2>
+                <div class="gauge-container">
+                    <canvas id="cpuGauge"></canvas>
+                    <div class="gauge-value" id="cpuValue">0%</div>
+                </div>
+                <div class="status" id="cpuStatus">正常</div>
+            </div>
+            
+            <div class="stat-card">
+                <h2>🧠 内存 使用率</h2>
+                <div class="gauge-container">
+                    <canvas id="memGauge"></canvas>
+                    <div class="gauge-value" id="memValue">0%</div>
+                </div>
+                <p>已用: <span id="memUsed">0</span> GB / 总共: <span id="memTotal">0</span> GB</p>
+                <div class="status" id="memStatus">正常</div>
+            </div>
+            
+            <div class="stat-card">
+                <h2>📊 网络流量</h2>
+                <div class="network-info">
+                    <div class="network-item">
+                        <span class="label">上传:</span>
+                        <span class="value" id="netSent">0 MB</span>
+                    </div>
+                    <div class="network-item">
+                        <span class="label">下载:</span>
+                        <span class="value" id="netRecv">0 MB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-container">
+            <div class="button-group">
+                <button id="restartBtn" class="restart-button">🔄 重启计算机</button>
+                <button id="shutdownBtn" class="shutdown-button">⏹️ 关闭计算机</button>
+            </div>
+            <div id="actionMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建仪表盘
+            function createGauge(ctx, value, color) {
+                return new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [value, 100 - value],
+                            backgroundColor: [color, '#f0f0f0'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        cutout: '80%',
+                        rotation: -90,
+                        circumference: 180,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        },
+                        animation: {
+                            duration: 0,
+                            animateRotate: false,
+                            animateScale: false
+                        }
+                    }
+                });
+            }
+
+            const cpuCtx = document.getElementById('cpuGauge');
+            const memCtx = document.getElementById('memGauge');
+            let cpuGauge = null, memGauge = null;
+
+            function updateGauges(data) {
+                // 更新最后更新时间
+                document.getElementById('lastUpdate').textContent = data.timestamp;
+                
+                // 更新CPU
+                document.getElementById('cpuValue').textContent = data.cpu + '%';
+                const cpuColor = data.cpu > 80 ? '#ff6384' : (data.cpu > 60 ? '#ffa500' : '#36a2eb');
+                document.getElementById('cpuStatus').textContent = data.cpu > 80 ? '警告' : (data.cpu > 60 ? '注意' : '正常');
+                document.getElementById('cpuStatus').className = 'status ' + (data.cpu > 80 ? 'warning' : (data.cpu > 60 ? 'caution' : 'normal'));
+                
+                if (cpuGauge) {
+                    cpuGauge.data.datasets[0].data = [data.cpu, 100 - data.cpu];
+                    cpuGauge.data.datasets[0].backgroundColor = [cpuColor, '#f0f0f0'];
+                    cpuGauge.update();
+                } else {
+                    cpuGauge = createGauge(cpuCtx, data.cpu, cpuColor);
+                }
+                
+                // 更新内存
+                document.getElementById('memValue').textContent = data.mem + '%';
+                document.getElementById('memUsed').textContent = data.mem_used;
+                document.getElementById('memTotal').textContent = data.mem_total;
+                const memColor = data.mem > 80 ? '#ff6384' : (data.mem > 60 ? '#ffa500' : '#4bc0c0');
+                document.getElementById('memStatus').textContent = data.mem > 80 ? '警告' : (data.mem > 60 ? '注意' : '正常');
+                document.getElementById('memStatus').className = 'status ' + (data.mem > 80 ? 'warning' : (data.mem > 60 ? 'caution' : 'normal'));
+                
+                if (memGauge) {
+                    memGauge.data.datasets[0].data = [data.mem, 100 - data.mem];
+                    memGauge.data.datasets[0].backgroundColor = [memColor, '#f0f0f0'];
+                    memGauge.update();
+                } else {
+                    memGauge = createGauge(memCtx, data.mem, memColor);
+                }
+                
+                // 更新网络信息
+                document.getElementById('netSent').textContent = data.net_sent + ' MB';
+                document.getElementById('netRecv').textContent = data.net_recv + ' MB';
+            }
+
+            function fetchSystemData() {
+                fetch('/system-data')
+                    .then(response => response.json())
+                    .then(data => updateGauges(data))
+                    .catch(error => console.error('Error:', error));
+            }
+
+            // 重启按钮事件
+            document.getElementById('restartBtn').addEventListener('click', () => {
+                if (confirm('确定要重启计算机吗？')) {
+                    fetch('/restart', { method: 'POST' })
+                        .then(response => response.text())
+                        .then(message => {
+                            document.getElementById('actionMessage').textContent = message;
+                        })
+                        .catch(error => {
+                            document.getElementById('actionMessage').textContent = '操作失败: ' + error;
+                        });
+                }
+            });
+
+            // 关机按钮事件
+            document.getElementById('shutdownBtn').addEventListener('click', () => {
+                if (confirm('确定要关闭计算机吗？此操作不可撤销！')) {
+                    fetch('/shutdown', { method: 'POST' })
+                        .then(response => response.text())
+                        .then(message => {
+                            document.getElementById('actionMessage').textContent = message;
+                        })
+                        .catch(error => {
+                            document.getElementById('actionMessage').textContent = '操作失败: ' + error;
+                        });
+                }
+            });
+
+            // 每2秒更新一次数据
+            setInterval(fetchSystemData, 2000);
+            fetchSystemData();
+        });
+    </script>
+</body>
+</html>
