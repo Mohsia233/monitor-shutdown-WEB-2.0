@@ -11,6 +11,8 @@
 
 使用需要psutil以及flask获取系统资源占用情况
 
+要求windows系统并保证python环境正确
+
 
 可使用pip命令安装
 
